@@ -1,0 +1,68 @@
+# =====================================================
+# Simple AI/ML App
+# - Works in Google Colab
+# - Works in HuggingFace Spaces
+# - Reads post1.txt from GitHub
+# - Displays content in UI
+# =====================================================
+
+# Install dependencies (safe for Colab, ignored if already installed)
+try:
+    import gradio as gr
+except:
+    import os
+    os.system("pip install gradio requests")
+
+import requests
+import gradio as gr
+
+# ==============================
+# CONFIG
+# ==============================
+# Replace with your GitHub RAW file link
+# Example:
+# https://raw.githubusercontent.com/username/repo/main/post1.txt
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/USERNAME/REPO/main/post1.txt"
+
+
+# ==============================
+# CORE FUNCTION
+# ==============================
+def load_post():
+    try:
+        response = requests.get(GITHUB_RAW_URL, timeout=10)
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        return f"Error loading file:\\n{str(e)}"
+
+
+# ==============================
+# UI (GRADIO)
+# ==============================
+with gr.Blocks(title="AI ML GitHub Text Viewer") as demo:
+
+    gr.Markdown("# 📄 AI/ML App — GitHub post1.txt Viewer")
+    gr.Markdown(
+        "This app pulls **post1.txt** directly from GitHub and displays it."
+    )
+
+    output = gr.Textbox(
+        label="post1.txt content",
+        lines=20,
+        max_lines=40
+    )
+
+    load_btn = gr.Button("Load post1.txt from GitHub")
+
+    load_btn.click(
+        fn=load_post,
+        inputs=[],
+        outputs=output
+    )
+
+# ==============================
+# RUN
+# ==============================
+if __name__ == "__main__":
+    demo.launch()
